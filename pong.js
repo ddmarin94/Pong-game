@@ -1,3 +1,25 @@
+class Vector {
+  constructor(x = 0, y = 0) {
+    this.x = x
+    this.y = y
+  }
+}
+
+class Paddles {
+  constructor(paddleWidth, paddleHeight) {
+    this.position = new Vector()
+    this.size = new Vector(paddleWidth, paddleHeight)
+  }
+}
+
+class Ball extends Paddles {
+  constructor() {
+    super(10, 10)
+    this.speed = new Vector()
+  }
+
+}
+
 
 class DrawPongField {
   constructor(canvasWidth, canvasHeight) {
@@ -14,6 +36,12 @@ class DrawPongField {
     return this
   }
 
+  _drawBall() {
+    this.context.fillStyle = '#FFF'
+    this.context.fillRect(0, 0, 15, 15)
+    return this
+  }
+
   _generateCanvas() {
     document.body.appendChild(this.canvas)
     return this
@@ -22,6 +50,7 @@ class DrawPongField {
   init() {
     this._drawField()
       ._generateCanvas()
+      ._drawBall()
   }
 }
 
@@ -30,4 +59,8 @@ class DrawPongField {
 window.addEventListener('DOMContentLoaded', () => {
   const pong = new DrawPongField(700, 600)
   pong.init()
+
+  const ball = new Ball()
+  console.log(ball)
+
 })
