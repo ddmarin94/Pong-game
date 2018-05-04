@@ -14,6 +14,12 @@ class DrawPongField {
     return this
   }
 
+  _drawBall() {
+    this.context.fillStyle = '#FFF'
+    this.context.fillRect(0, 0, 15, 15)
+    return this
+  }
+
   _generateCanvas() {
     document.body.appendChild(this.canvas)
     return this
@@ -22,6 +28,7 @@ class DrawPongField {
   init() {
     this._drawField()
       ._generateCanvas()
+      ._drawBall()
   }
 }
 
