@@ -14,53 +14,49 @@ class Paddles {
 
 class Ball extends Paddles {
   constructor() {
-    super(10, 10)
+    super(15, 15)
     this.speed = new Vector()
   }
 
 }
 
 
-class DrawPongField {
-  constructor(canvasWidth, canvasHeight) {
-    this.canvas = document.createElement('canvas')
-    this.canvas.width = canvasWidth
-    this.canvas.height = canvasHeight
-    this.context = this.canvas.getContext('2d')
-  }
-
-  _drawField() {
-    this.context.fillStyle = '#000'
-    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
-
-    return this
-  }
-
-  _drawBall() {
-    this.context.fillStyle = '#FFF'
-    this.context.fillRect(0, 0, 15, 15)
-    return this
-  }
-
-  _generateCanvas() {
-    document.body.appendChild(this.canvas)
-    return this
-  }
-
-  init() {
-    this._drawField()
-      ._generateCanvas()
-      ._drawBall()
-  }
-}
-
-
 
 window.addEventListener('DOMContentLoaded', () => {
-  const pong = new DrawPongField(700, 600)
-  pong.init()
+  const canvas = document.createElement('canvas')
+    canvas.width = 700
+    canvas.height = 600
+
+    document.body.appendChild(canvas)
+
+  const context = canvas.getContext('2d')
 
   const ball = new Ball()
-  console.log(ball)
+  ball.position.x = 0
+  ball.position.y = 0
+  ball.speed.x = 150
+  ball.speed.y = 150
 
+  // pong.drawBall(ball)
+
+  let lastTime
+  function callback(millis) {
+    if (lastTime) {
+      update(((millis - lastTime) / 1000))
+    }
+    lastTime = millis
+    requestAnimationFrame(callback)
+  }
+
+  function update(dt) {
+    ball.position.x += ball.speed.x * dt
+    ball.position.y += ball.speed.y * dt
+
+    context.fillStyle = '#000'
+    context.fillRect(0, 0, canvas.width, canvas.height)
+
+    context.fillStyle = '#FFF'
+    context.fillRect(ball.position.x, ball.position.y, ball.size.x, ball.size.y)
+  }
+  callback()
 })
