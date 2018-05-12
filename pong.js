@@ -5,17 +5,65 @@ class Vector {
   }
 }
 
-class Paddles {
+class Rectangles {
   constructor(paddleWidth, paddleHeight) {
     this.position = new Vector()
     this.size = new Vector(paddleWidth, paddleHeight)
   }
+
 }
 
-class Ball extends Paddles {
+class Ball extends Rectangles {
   constructor() {
     super(15, 15)
     this.speed = new Vector()
+  }
+}
+
+class Pong {
+  constructor() {
+    this._canvas = document.createElement("canvas")
+    this._canvas.width = 700
+    this._canvas.height = 600
+    this._canvas.id = 'pong'
+    this._context = this._canvas.getContext('2d')
+    this.ball = new Ball
+    this.ball.position.x = 0
+    this.ball.position.y = 0
+    this.ball.speed.x = 150
+    this.ball.speed.y = 150
+    
+    if(document.querySelector('#pong') === null) {
+      document.body.appendChild(this._canvas);      
+    }
+
+    let lastTime
+    const callback = (currentTime) => {
+      if (lastTime) {
+        this.update((currentTime - lastTime) / 1000);
+      }
+      lastTime = currentTime;
+      requestAnimationFrame(callback)
+    };
+    callback()
+  }
+
+  update(deltaTime) {
+    this.ball.position.x += this.ball.speed.x * deltaTime
+    this.ball.position.y += this.ball.speed.y * deltaTime
+
+    if (this.ball.position.x < 0 || this.ball.position.x > (this._canvas.width - this.ball.size.x)) {
+      this.ball.speed.x = -this.ball.speed.x
+    }
+    if (this.ball.position.y < 0 || this.ball.position.y > (this._canvas.height - this.ball.size.y)) {
+      this.ball.speed.y = -this.ball.speed.y
+    }
+
+    this._context.fillStyle = '#000'
+    this._context.fillRect(0, 0, this._canvas.width, this._canvas.height)
+
+    this._context.fillStyle = '#FFF'
+    this._context.fillRect(this.ball.position.x, this.ball.position.y, this.ball.size.x, this.ball.size.y)
   }
 
 }
@@ -23,40 +71,5 @@ class Ball extends Paddles {
 
 
 window.addEventListener('DOMContentLoaded', () => {
-  const canvas = document.createElement('canvas')
-    canvas.width = 700
-    canvas.height = 600
-
-    document.body.appendChild(canvas)
-
-  const context = canvas.getContext('2d')
-
-  const ball = new Ball()
-  ball.position.x = 0
-  ball.position.y = 0
-  ball.speed.x = 150
-  ball.speed.y = 150
-
-  // pong.drawBall(ball)
-
-  let lastTime
-  function callback(millis) {
-    if (lastTime) {
-      update(((millis - lastTime) / 1000))
-    }
-    lastTime = millis
-    requestAnimationFrame(callback)
-  }
-
-  function update(dt) {
-    ball.position.x += ball.speed.x * dt
-    ball.position.y += ball.speed.y * dt
-
-    context.fillStyle = '#000'
-    context.fillRect(0, 0, canvas.width, canvas.height)
-
-    context.fillStyle = '#FFF'
-    context.fillRect(ball.position.x, ball.position.y, ball.size.x, ball.size.y)
-  }
-  callback()
+  const pong = new Pong()
 })
