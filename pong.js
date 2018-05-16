@@ -5,18 +5,44 @@ class Vector {
   }
 }
 
-class Rectangles {
-  constructor(paddleWidth, paddleHeight) {
+class Rectangle {
+  constructor(rectangleWidth, rectangleHeight) {
     this.position = new Vector()
-    this.size = new Vector(paddleWidth, paddleHeight)
+    this.size = new Vector(rectangleWidth, rectangleHeight)
+  }
+
+  get left() {
+    return this.position.x - this.size.x / 2
+  }
+
+  get right() {
+    return this.position.x + this.size.x / 2
+  }
+
+  get top() {
+    return this.position.y - this.size.y / 2
+  }
+
+  get bottom() {
+    return this.position.y + this.size.y / 2
   }
 
 }
 
-class Ball extends Rectangles {
-  constructor() {
-    super(15, 15)
-    this.speed = new Vector()
+class Ball extends Rectangle {
+  constructor(ballWidth, ballHeight) {
+    super(ballWidth, ballHeight);
+    this.speed = new Vector();
+  }
+}
+
+class Player extends Rectangle {
+  constructor(moveDown, moveUp) {
+    super(15, 100)
+    this.score = 0
+    this.moveDown = moveDown
+    this.moveUp = moveUp
+    this.keyState = {}
   }
 }
 
@@ -27,25 +53,26 @@ class Pong {
     this._canvas.height = 600
     this._canvas.id = 'pong'
     this._context = this._canvas.getContext('2d')
-    this.ball = new Ball
+    this.ball = new Ball(20, 20)
     this.ball.position.x = 0
     this.ball.position.y = 0
     this.ball.speed.x = 150
     this.ball.speed.y = 150
-    
-    if(document.querySelector('#pong') === null) {
-      document.body.appendChild(this._canvas);      
-    }
+    this.players = null
 
-    let lastTime
-    const callback = (currentTime) => {
-      if (lastTime) {
-        this.update((currentTime - lastTime) / 1000);
-      }
-      lastTime = currentTime;
-      requestAnimationFrame(callback)
-    };
-    callback()
+  }
+
+  drawElements() {
+    this._context.fillStyle = '#000'
+    this._context.fillRect(0, 0, this._canvas.width, this._canvas.height)
+
+    this.drawRectangle(this.ball)
+    this.players.forEach( player => this.drawRectangle(player) )
+  }
+
+  drawRectangle(rectangle) {
+    this._context.fillStyle = '#FFF'
+    this._context.fillRect(rectangle.left, rectangle.top, rectangle.size.x, rectangle.size.y)
   }
 
   update(deltaTime) {
@@ -59,17 +86,57 @@ class Pong {
       this.ball.speed.y = -this.ball.speed.y
     }
 
-    this._context.fillStyle = '#000'
-    this._context.fillRect(0, 0, this._canvas.width, this._canvas.height)
+    this.players.forEach(player => {
+      if (player.keyState[player.moveUp]) {
+        player.position.y += 7
+      }
+      if (player.keyState[player.moveDown]) {
+        player.position.y -= 7
+      }
+      player.position.y = Math.max(Math.min(player.position.y, this._canvas.height - (player.size.y / 2)), (player.size.y / 2));
+    })
+    this.drawElements();
+  }
 
-    this._context.fillStyle = '#FFF'
-    this._context.fillRect(this.ball.position.x, this.ball.position.y, this.ball.size.x, this.ball.size.y)
+  createPlayers() {
+    this.players = [new Player(87, 83), new Player(38, 40)]
+    this.players[0].position.x = 40;
+    this.players[1].position.x = this._canvas.width - 40;
+
+    document.addEventListener('keydown', (event) => {
+      this.players.forEach(player => player.keyState[event.keyCode] = true)
+      })
+      
+    document.addEventListener('keyup', (event) => {
+      this.players.forEach(player => delete player.keyState[event.keyCode])
+    })
+
+    this.players.forEach(player => player.position.y = this._canvas.height / 2)
+    return this
+  }
+
+  startLoop() {
+    let lastTime
+    const callback = (currentTime) => {
+      if (lastTime) {
+        this.update((currentTime - lastTime) / 1000)
+      }
+      lastTime = currentTime
+      requestAnimationFrame(callback)
+    }
+    callback()
+    return this
+  }
+
+  init() {
+    if (document.querySelector('#pong') === null) {
+      document.querySelector("#canvasWrapper").appendChild(this._canvas);
+    }
+      this.createPlayers().startLoop()
   }
 
 }
 
-
-
 window.addEventListener('DOMContentLoaded', () => {
-  const pong = new Pong()
+  const pong = new Pong().init();
 })
