@@ -54,10 +54,10 @@ class Pong {
     this._canvas.id = 'pong'
     this._context = this._canvas.getContext('2d')
     this.ball = new Ball(20, 20)
-    this.ball.position.x = 0
-    this.ball.position.y = 0
-    this.ball.speed.x = 150
-    this.ball.speed.y = 150
+    this.ball.position.x = 80
+    this.ball.position.y = 80
+    this.ball.speed.x = 250
+    this.ball.speed.y = 250
     this.players = null
 
   }
@@ -75,6 +75,23 @@ class Pong {
     this._context.fillRect(rectangle.left, rectangle.top, rectangle.size.x, rectangle.size.y)
   }
 
+  collision(player, ball) {
+    if(player.left < ball.right && player.right > ball.left && 
+      player.top < ball.bottom && player.bottom > ball.top) {
+      ball.speed.x = -ball.speed.x
+    }
+  }
+
+  updatePlayersPaddles(player) {
+    if (player.keyState[player.moveUp]) {
+      player.position.y += 7
+    }
+    if (player.keyState[player.moveDown]) {
+      player.position.y -= 7
+    }
+    player.position.y = Math.max(Math.min(player.position.y, this._canvas.height - (player.size.y / 2)), (player.size.y / 2));
+  }
+
   update(deltaTime) {
     this.ball.position.x += this.ball.speed.x * deltaTime
     this.ball.position.y += this.ball.speed.y * deltaTime
@@ -87,14 +104,10 @@ class Pong {
     }
 
     this.players.forEach(player => {
-      if (player.keyState[player.moveUp]) {
-        player.position.y += 7
-      }
-      if (player.keyState[player.moveDown]) {
-        player.position.y -= 7
-      }
-      player.position.y = Math.max(Math.min(player.position.y, this._canvas.height - (player.size.y / 2)), (player.size.y / 2));
+      this.updatePlayersPaddles(player)
+      this.collision(player, this.ball)
     })
+
     this.drawElements();
   }
 
@@ -125,7 +138,6 @@ class Pong {
       requestAnimationFrame(callback)
     }
     callback()
-    return this
   }
 
   init() {
