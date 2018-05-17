@@ -69,9 +69,24 @@ class Pong {
 
   }
 
+  drawNet() {
+    const w = 4
+    const x = (this._canvas.width - w) * 0.5;
+    let y = 0
+    const step = this._canvas.height / 20
+    while (y < this._canvas.height) {
+      this._context.fillStyle = '#FFF'
+      this._context.fillRect(x, y + step * 0.25, w, step * 0.5);
+      y += step;
+    }
+  }
+
   drawElements() {
+
     this._context.fillStyle = '#000'
     this._context.fillRect(0, 0, this._canvas.width, this._canvas.height)
+
+    this.drawNet()
 
     this.drawRectangle(this.ball)
     this.players.forEach( player => this.drawRectangle(player) )
