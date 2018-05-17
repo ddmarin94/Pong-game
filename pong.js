@@ -54,10 +54,6 @@ class Pong {
     this._canvas.id = 'pong'
     this._context = this._canvas.getContext('2d')
     this.ball = new Ball(20, 20)
-    this.ball.position.x = 80
-    this.ball.position.y = 80
-    this.ball.speed.x = 250
-    this.ball.speed.y = 250
     this.players = null
 
   }
@@ -90,6 +86,14 @@ class Pong {
       player.position.y -= 7
     }
     player.position.y = Math.max(Math.min(player.position.y, this._canvas.height - (player.size.y / 2)), (player.size.y / 2));
+  }
+
+  serveBall() {
+    this.ball.position.x = 80
+    this.ball.position.y = 80
+    this.ball.speed.x = 300
+    this.ball.speed.y = 300 
+    this.ball.speed.length = 300
   }
 
   update(deltaTime) {
@@ -138,13 +142,15 @@ class Pong {
       requestAnimationFrame(callback)
     }
     callback()
+    return this
   }
 
   init() {
     if (document.querySelector('#pong') === null) {
       document.querySelector("#canvasWrapper").appendChild(this._canvas);
     }
-      this.createPlayers().startLoop()
+    this.createPlayers().startLoop().serveBall()
+       
   }
 
 }
