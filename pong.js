@@ -96,10 +96,10 @@ class Pong {
     this.ball.position.x += this.ball.speed.x * deltaTime
     this.ball.position.y += this.ball.speed.y * deltaTime
 
-    if (this.ball.position.x < 0 || this.ball.position.x > (this._canvas.width - this.ball.size.x)) {
+    if (this.ball.left < 0 || this.ball.right > this._canvas.width) {
       this.ball.speed.x = -this.ball.speed.x
     }
-    if (this.ball.position.y < 0 || this.ball.position.y > (this._canvas.height - this.ball.size.y)) {
+    if (this.ball.top < 0 || this.ball.bottom > this._canvas.height) {
       this.ball.speed.y = -this.ball.speed.y
     }
 
