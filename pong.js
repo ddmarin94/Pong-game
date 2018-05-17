@@ -3,6 +3,17 @@ class Vector {
     this.x = x
     this.y = y
   }
+  // hipotenusa of the vector
+  get length() {
+    return Math.sqrt(this.x * this.x + this.y * this.y)
+  }
+
+  set length(value) {
+    const multiplicationFactor = value / this.length
+    this.x *= multiplicationFactor
+    this.y *= multiplicationFactor
+  }
+
 }
 
 class Rectangle {
@@ -75,6 +86,7 @@ class Pong {
     if(player.left < ball.right && player.right > ball.left && 
       player.top < ball.bottom && player.bottom > ball.top) {
       ball.speed.x = -ball.speed.x
+      ball.speed.length *= 1.05
     }
   }
 
@@ -100,11 +112,15 @@ class Pong {
     this.ball.position.x += this.ball.speed.x * deltaTime
     this.ball.position.y += this.ball.speed.y * deltaTime
 
-    if (this.ball.left < 0 || this.ball.right > this._canvas.width) {
-      this.ball.speed.x = -this.ball.speed.x
-    }
     if (this.ball.top < 0 || this.ball.bottom > this._canvas.height) {
       this.ball.speed.y = -this.ball.speed.y
+    }
+
+    if(this.ball.left < 0 || this.ball.right > this._canvas.width) {
+      let playerId = this.ball.speed.x < 0 | 0
+      this.players[playerId].score++
+      this.serveBall()
+      console.log(playerId)
     }
 
     this.players.forEach(player => {
