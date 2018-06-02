@@ -66,6 +66,46 @@ class Pong {
     this._context = this._canvas.getContext('2d')
     this.ball = new Ball(20, 20)
     this.players = null
+    this.numberCharacterPixelSize = 10;
+
+    this.numbers = [
+      "111101101101111",
+      "010010010010010", 
+      "111001111100111", 
+      "111001111001111", 
+      "101101111001001", 
+      "111100111001111", 
+      "111100111101111", 
+      "111001001001001", 
+      "111101111101111", 
+      "111101111001111"].map(
+      numberStr => {
+        const canvas = document.createElement("canvas");
+        canvas.id = "mark";
+        canvas.height = 5 * this.numberCharacterPixelSize;
+        canvas.width = 3 * this.numberCharacterPixelSize;
+        const context = canvas.getContext("2d");
+        context.fillStyle = "#fff";
+        // if (document.querySelector('#mark') === null) {
+        //   document.body.appendChild(canvas)
+        // }
+        numberStr.split("").forEach((element, index) => {
+          // console.log => result 0, 10, 20
+          // console.log( (index % 3) * 10 )
+          // console.log => result 0, 10, 20
+          // console.log( (index % 3) * 10, (index / 3 | 0) * 10, 10, 10)
+          if (element === "1") {
+            context.fillRect(
+              (index % 3) * this.numberCharacterPixelSize,
+              ((index / 3) | 0) * this.numberCharacterPixelSize,
+              this.numberCharacterPixelSize,
+              this.numberCharacterPixelSize
+            );
+          }
+        });
+        return canvas;
+      }
+    );
 
   }
 
@@ -90,6 +130,8 @@ class Pong {
 
     this.drawRectangle(this.ball)
     this.players.forEach( player => this.drawRectangle(player) )
+
+    this.drawScore()
   }
 
   drawRectangle(rectangle) {
@@ -154,7 +196,6 @@ class Pong {
     document.addEventListener('keydown', (event) => {
       this.players.forEach(player => player.keyState[event.keyCode] = true)
       })
-      
     document.addEventListener('keyup', (event) => {
       this.players.forEach(player => delete player.keyState[event.keyCode])
     })
@@ -176,12 +217,23 @@ class Pong {
     return this
   }
 
+  drawScore() {
+    const alignScoreBoard = this._canvas.width / 4
+    const scoreBoardWidth = this.numberCharacterPixelSize * 3
+    this.players.forEach((player, index) => {
+      const characters = player.score.toString().split('')
+      const offset = alignScoreBoard * (index + 1) - scoreBoardWidth * characters.length / 2 * this.numberCharacterPixelSize / 2;
+      characters.forEach((char, position) => {
+        this._context.drawImage(this.numbers[char | 0], offset + position * scoreBoardWidth, 20);
+      })
+    })
+  }
+
   init() {
     if (document.querySelector('#pong') === null) {
       document.querySelector("#canvasWrapper").appendChild(this._canvas);
     }
-    this.createPlayers().startLoop().serveBall()
-       
+    this.createPlayers().startLoop().serveBall()   
   }
 
 }
